@@ -5,6 +5,33 @@ from world import World
 import random
 from ast import literal_eval
 
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqeueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+        
+class Stack():
+    def __init__(self):
+        self.stack = []
+    def push(self, value):
+        self.stack.append(value)
+    def pop(self):
+        if self.size() > 0:
+            return self.stack.pop()
+        else:
+            return None
+    def size(self):
+        return len(self.stack)
+
+        
 # Load world
 world = World()
 
@@ -28,8 +55,28 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
+path = []
+visited = {}
+directions = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
+visited[player.current_room.id] = player.current_room.get_exits()
 
+while len(visited) < len(room_graph) -1:
+    if player.current_room.id not in visited:
+        visited[player.current_room.id] = player.current_room.get_exits()
+        random.shuffle(visited[player.current_room.id])
+        last_direction = path[-1]
+        visited[player.current_room.id].remove(last_direction)
+
+    while len(visited[player.current_room.id]) < 1:
+        last_direction = path.pop()
+        traversal_path.append(last_direction)
+        player.travel(last_direction)
+
+    move_direction = visited[player.current_room.id].pop(0)
+    traversal_path.append(move_direction)
+    path.append(directions[move_direction])
+    player.travel(move_direction)
 
 # TRAVERSAL TEST
 visited_rooms = set()
